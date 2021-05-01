@@ -20,7 +20,8 @@ const config = {
 			},
 			timezone: '+08:00'
 		}
-	}
+	},
+	SALT_WORK_FACTOR: 10 // 加密算法的加密幂次
 }
 
 /**
