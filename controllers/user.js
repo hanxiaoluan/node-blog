@@ -52,7 +52,7 @@ class UserController {
 		const validator = ctx.validate(ctx.request.body, {
 			username: Joi.string().required(),
 			password: Joi.string().required(),
-			email: Joi.string().email().require()
+			email: Joi.string().email().required()
 		})
 
 		if (validator) {
@@ -66,7 +66,7 @@ class UserController {
 				if (user && !user.github) {
 					ctx.throw(403, '用户名已被占用')
 				} else {
-					const saltPassword = encrypt(password)
+					const saltPassword = await encrypt(password)
 					await UserModel.create({ username, password: saltPassword, email })
 
 					ctx.status = 204
@@ -77,3 +77,59 @@ class UserController {
 }
 
 module.exports = UserController
+
+// module.exports = {
+// 	async login(ctx) {
+// 		try {
+// 			const { username, password } = ctx.request.body
+// 			const user = await UserModel.findOne({ username })
+// 			if (!user) {
+// 				ctx.body = {
+// 					code: 1,
+// 					message: '用户不存在'
+// 				}
+// 			} else {
+// 				if (user.password !== password) {
+// 					ctx.body = {
+// 						code: 1,
+// 						message: '密码不正确'
+// 					}
+// 				} else {
+// 					ctx.body = {
+// 						code: 0,
+// 						message: '登录成功'
+// 					}
+// 				}
+// 			}
+// 		} catch (error) {
+// 			ctx.body = {
+// 				code: 500,
+// 				message: 'Internal Server Error'
+// 			}
+// 		}
+// 	},
+
+// 	async register(ctx) {
+// 		const { username, password } = ctx.request.body
+// 		const checkUser = await UserModel.findOne({ username })
+// 		if (checkUser) {
+// 			ctx.body = {
+// 				code: 403,
+// 				msg: 'this username account is already in use.'
+// 			}
+// 		} else {
+// 			const result = await UserModel.create({ username, password })
+// 			if (result !== null) {
+// 				ctx.body = {
+// 					code: 0,
+// 					message: '注册成功'
+// 				}
+// 			} else {
+// 				ctx.body = {
+// 					code: 1,
+// 					message: '注册失败'
+// 				}
+// 			}
+// 		}
+// 	}
+// }
