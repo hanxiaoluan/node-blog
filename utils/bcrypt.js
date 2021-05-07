@@ -26,9 +26,9 @@ exports.encrypt = password => {
  */
 exports.comparePassword = (password, hash) => {
 	return new Promise((resolve, reject) => {
-		bcrypt.compare(password, hash, (err, matched) => {
+		bcrypt.compare(password, hash, (err, isMatched) => {
 			if (err) reject(err)
-			resolve(matched)
+			resolve(isMatched)
 		})
 	})
 }

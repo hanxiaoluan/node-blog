@@ -1,5 +1,5 @@
 const Koa = require('koa')
-const koaBody = require('koa-body')
+// const koaBody = require('koa-body')
 const cors = require('koa2-cors')
 const logger = require('koa-logger')
 
@@ -17,8 +17,9 @@ app.listen(config.PORT, () => {
 	db.sequelize.sync({ force: false })
 		.then(async() => {
 			console.log('sequelize connect success')
-			console.log('server listern on http://127.0.0.1:6060')
+			console.log(`server listen on http://127.0.0.1:${config.PORT}`)
 		}).catch(err => {
 			console.error(err)
 		})
 })
+
