@@ -21,7 +21,11 @@ const config = {
 			timezone: '+08:00'
 		}
 	},
-	SALT_WORK_FACTOR: 10 // 加密算法的加密幂次
+	SALT_WORK_FACTOR: 10, // 加密算法的加密幂次
+	TOKEN: {
+		secret: 'luanhanxiao-test', // secret is very important!
+		expiresIn: '720h' // token 有效期
+	}
 }
 
 /**
