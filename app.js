@@ -15,6 +15,9 @@ Object.keys(context).forEach(key => {
 	app.context[key] = context[key]
 })
 
+// middlewares
+const authHandler = require('./utils/context')
+
 app.use(cors()).use(
 	koaBody({
 		multipart: true,
@@ -27,7 +30,7 @@ app.use(cors()).use(
 	error({
 		postFormat: (e, { stack, ...rest }) => (process.env.NODE_ENV !== 'development' ? rest : { stack, ...rest })
 	})
-).use(logger())
+).use(authHandler).use(logger())
 
 loadedRouter(app)
 
