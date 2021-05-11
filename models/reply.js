@@ -1,16 +1,14 @@
 const moment = require('moment')
 
-// article 表
 module.exports = (sequelize, dataTypes) => {
-	const Comment = sequelize.define(
-		'comment',
+	const Reply = sequelize.define(
+		'reply',
 		{
 			id: {
 				type: dataTypes.INTEGER(11),
-				primayKey: true,
+				primaryKey: true,
 				autoIncrement: true
 			},
-			articleId: dataTypes.INTEGER(11),
 			content: { type: dataTypes.TEXT, allowNull: false },
 			createdAt: {
 				type: dataTypes.DATE,
@@ -26,32 +24,19 @@ module.exports = (sequelize, dataTypes) => {
 					return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss')
 				}
 			}
-		}, {
+		},
+		{
 			timestamps: true
 		}
 	)
 
-	Comment.associate = models => {
-		Comment.belongsTo(models.article, {
-			as: 'article',
-			foreignKey: 'articleId',
-			targetKey: 'id',
-			constraints: false
-		})
-
-		Comment.belongsTo(models.user, {
+	Reply.associate = models => {
+		Reply.belongsTo(models.user, {
 			foreignKey: 'userId',
 			targetKey: 'id',
-			contraints: false
-		})
-
-		Comment.hasMany(models.reply, {
-			foreignKey: 'commentId',
-			sourceKey: 'id',
 			constraints: false
 		})
 	}
 
-	return Comment
+	return Reply
 }
-
