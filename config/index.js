@@ -1,6 +1,14 @@
 
 const config = {
 	PORT: 9527,
+	ADMIN_GITHUB_LOGIN_NAME: 'gershonv', // 博主的 github 登录的账户名 user
+	GITHUB: {
+		client_id: 'c6a96a84105bb0be1fe5',
+		client_secret: '463f3994ab5687544b2cddbb6cf44920bf179ad9',
+		access_token_url: 'https://github.com/login/oauth/access_token',
+		fetch_user_url: 'https://api.github.com/user', // 用于 oauth2
+		fetch_user: 'https://api.github.com/users/' // fetch user url https://api.github.com/users/gershonv
+	},
 	DATABASE: {
 		database: 'node-blog',
 		user: 'root',

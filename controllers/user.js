@@ -1,8 +1,35 @@
 const Joi = require('joi')
+const axios = require('axios')
+const { GITHUB } = require('../config')
+const { decodeQuery } = require('../utils/index.js')
 const { comparePassword, encrypt } = require('../utils/bcrypt')
-const { user: UserModel } = require('../models')
+const { user: UserModel, comment: CommentModel, reply: ReplyModel, ip: IpModel, sequelize } = require('../models')
+const { createToken } = require('../utils/token')
 
+async function getGithubInfo(username) {
+	const result = await axios.get(`${GITHUB.fetch_user}${username}`)
+	return result && result.data
+}
 class UserController {
+	static find(params) {
+		return UserModel.findOne({ where: params })
+	}
+
+	static createGithubUser(data, role = 2) {
+		const { id, login, email } = data
+		return UserModel.create({
+			id,
+			username: login,
+			role,
+			email,
+			github: JSON.stringify(data)
+		})
+	}
+
+	static updateUserById(userId, data) {
+		return UserModel.update(data, { where: { id: userId }})
+	}
+
 	static async login(ctx) {
 		const { code } = ctx.request.body
 		if (code) {
@@ -43,8 +70,52 @@ class UserController {
 	}
 
 	// github登录
-	static async githubLogin(ctx, login) {
+	static async githubLogin(ctx, code) {
+		const result = await axios.post(GITHUB.access_token_url, {
+			client_id: GITHUB.client_id,
+			client_secret: GITHUB.client_secret,
+			code
+		})
 
+		const { access_token } = decodeQuery(result.data)
+
+		if (access_token) {
+			const result2 = await axios.get(`${GITHUB.fetch_user_url}?access_token=${access_token}`)
+			const githubInfo = result2.data
+
+			let target = await UserController.find({ id: githubInfo.id })
+
+			if (!target) {
+				target = await UserModel.create({
+					id: githubInfo.id,
+					username: githubInfo.name || githubInfo.username,
+					github: JSON.stringify(githubInfo),
+					email: githubInfo.email
+				})
+			} else {
+				if (target.github !== JSON.stringify(githubInfo)) {
+					const { id, login, email } = githubInfo
+					const data = {
+						username: login,
+						email,
+						github: JSON.stringify(githubInfo)
+					}
+					await UserController.updateUserById(id, data)
+				}
+			}
+
+			const token = createToken({ userId: githubInfo.id, role: target.role })
+
+			ctx.body = {
+				github: githubInfo,
+				username: target.username,
+				userId: target.id,
+				role: target.role,
+				token
+			}
+		} else {
+			ctx.throw(403, 'github 授权码已失效')
+		}
 	}
 
 	// 注册
