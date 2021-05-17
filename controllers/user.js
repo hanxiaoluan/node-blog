@@ -145,6 +145,22 @@ class UserController {
 			}
 		}
 	}
+
+	/**
+   * 初始化用户
+   * @param {String} githubLoginName - github name
+   */
+	static async initGithubUser(githubLoginName) {
+		try {
+			const github = await getGithubInfo(githubLoginName)
+			const temp = await UserController.find({ id: github.id })
+			if (!temp) {
+				UserController.createGithubUser(github, 1)
+			}
+		} catch (error) {
+			console.trace('create github user error ==============>', error.message)
+		}
+	}
 }
 
 module.exports = UserController
